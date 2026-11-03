@@ -44,12 +44,16 @@
       text-transform: uppercase;
     }
 
+    nav {
+      display: flex;
+      gap: 10px;
+    }
+
     nav button {
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      margin-left: 15px;
       font-size: 0.95rem;
       font-weight: 600;
       transition: color 0.2s;
@@ -65,7 +69,7 @@
     }
 
     .hero h1 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 800;
       letter-spacing: 1px;
       margin-bottom: 10px;
@@ -74,11 +78,11 @@
 
     .hero p {
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .section-title {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 15px;
       border-left: 4px solid var(--accent-color);
@@ -87,8 +91,8 @@
 
     .media-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 14px;
       margin-bottom: 40px;
     }
 
@@ -98,16 +102,11 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
     }
 
     .card img {
       width: 100%;
-      height: 210px;
+      height: 190px;
       object-fit: cover;
       background-color: #334155;
     }
@@ -117,7 +116,7 @@
     }
 
     .card-title {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 4px;
       white-space: nowrap;
@@ -126,7 +125,7 @@
     }
 
     .card-category {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -136,6 +135,8 @@
       color: var(--text-muted);
       font-size: 0.9rem;
       grid-column: 1 / -1;
+      text-align: center;
+      padding: 20px;
     }
   </style>
 </head>
@@ -144,6 +145,124 @@
   <header>
     <div class="logo">VARDÍRA</div>
     <nav>
-      <button class="active" onclick="loadContent('all')">All</button>
-      <button onclick="loadContent('shows')">Series</button>
-      <button onclick="loadContent('comics')
+      <button class="active" onclick="switchTab('all', this)">All</button>
+      <button onclick="switchTab('shows', this)">Series</button>
+      <button onclick="switchTab('comics', this)">Comics</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>YOUR NEXT WORLD AWAITS.</h1>
+    <p>Discover series, manga, webtoons, and graphic novels.</p>
+  </section>
+
+  <main>
+    <h2 class="section-title" id="grid-title">Trending Content</h2>
+    <div id="media-container" class="media-grid">
+      <p class="loading-text">Loading catalog...</p>
+    </div>
+  </main>
+
+  <script>
+    let cachedItems = [];
+
+    async function fetchAllData() {
+      const container = document.getElementById('media-container');
+      
+      try {
+        // 1. Fetch TV Shows
+        const showsPromise = fetch('https://api.tvmaze.com/shows')
+          .then(res => res.json())
+          .then(data => data.slice(0, 12).map(show => ({
+            title: show.name,
+            category: 'Series',
+            cover_url: show.image ? show.image.medium : 'https://via.placeholder.com/210x295/1e293b/ffffff?text=No+Cover'
+          })))
+          .catch(() => []);
+
+        // 2. Fetch Comics / Webtoons via AniList
+        const query = `
+          query {
+            Page(page: 1, perPage: 12) {
+              media(type: MANGA, sort: TRENDING_DESC) {
+                title {
+                  english
+                  romaji
+                }
+                coverImage {
+                  large
+                }
+              }
+            }
+          }
+        `;
+
+        const comicsPromise = fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ query })
+        })
+        .then(res => res.json())
+        .then(result => {
+          if (!result.data || !result.data.Page) return [];
+          return result.data.Page.media.map(item => ({
+            title: item.title.english || item.title.romaji || 'Untitled',
+            category: 'Comic / Webtoon',
+            cover_url: item.coverImage ? item.coverImage.large : 'https://via.placeholder.com/210x295/1e293b/ffffff?text=No+Cover'
+          }));
+        })
+        .catch(() => []);
+
+        // Wait for both requests
+        const [shows, comics] = await Promise.all([showsPromise, comicsPromise]);
+        
+        cachedItems = [...shows, ...comics];
+
+        if (cachedItems.length === 0) {
+          container.innerHTML = '<p class="loading-text">Could not load items. Please check your connection.</p>';
+          return;
+        }
+
+        renderItems(cachedItems);
+
+      } catch (err) {
+        console.error("Error loading data:", err);
+        container.innerHTML = '<p class="loading-text">Error loading catalog.</p>';
+      }
+    }
+
+    function renderItems(items) {
+      const container = document.getElementById('media-container');
+      container.innerHTML = items.map(item => `
+        <div class="card">
+          <img src="${item.cover_url}" alt="${item.title}" loading="lazy">
+          <div class="card-content">
+            <div class="card-title">${item.title}</div>
+            <div class="card-category">${item.category}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchTab(filter, btn) {
+      // Update active button style
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (filter === 'shows') {
+        const filtered = cachedItems.filter(item => item.category === 'Series');
+        renderItems(filtered);
+      } else if (filter === 'comics') {
+        const filtered = cachedItems.filter(item => item.category === 'Comic / Webtoon');
+        renderItems(filtered);
+      } else {
+        renderItems(cachedItems);
+      }
+    }
+
+    // Run on load
+    document.addEventListener('DOMContentLoaded', fetchAllData);
+  </script>
+
+</body>
+</html>

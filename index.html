@@ -22,7 +22,7 @@
     <div class="logo" onclick="showCatalogView()">VARDÍRA</div>
     <div style="display: flex; gap: 10px; align-items: center; width: 100%; max-width: 450px; justify-content: flex-end;">
       <div class="search-bar" id="searchBarContainer" style="flex-grow: 1;">
-        <input type="text" id="searchInput" placeholder="Search titles..." oninput="handleSearch()">
+        <input type="text" id="searchInput" placeholder="Search titles, countries..." oninput="handleSearch()">
       </div>
       <button class="danger-icon-btn" onclick="openResetModal()" title="Reset All Data">🗑️</button>
     </div>
@@ -35,10 +35,15 @@
       <p>Track, rate, and review K-Dramas, C-Dramas, J-Dramas, Thai series, and Asian movies.</p>
     </section>
 
+    <!-- FILTER & CATEGORY NAV -->
     <div class="filter-nav">
       <button class="filter-btn active" onclick="filterCategory('all', this)">All</button>
       <button class="filter-btn" onclick="filterCategory('Movies', this)">Movies</button>
       <button class="filter-btn" onclick="filterCategory('Series', this)">Series</button>
+      <button class="filter-btn" onclick="filterCategory('South Korea', this)">🇰🇷 Korea</button>
+      <button class="filter-btn" onclick="filterCategory('Japan', this)">🇯🇵 Japan</button>
+      <button class="filter-btn" onclick="filterCategory('China', this)">🇨🇳 China</button>
+      <button class="filter-btn" onclick="filterCategory('Thailand', this)">🇹🇭 Thailand</button>
       <button class="filter-btn" onclick="filterCategory('Watching', this)">👀 Watching</button>
       <button class="filter-btn" onclick="filterCategory('Completed', this)">✅ Completed</button>
       <button class="filter-btn" onclick="filterCategory('Plan to Watch', this)">📌 Plan to Watch</button>
@@ -50,6 +55,9 @@
       <div id="media-container" class="media-grid">
         <div class="loading-state">Loading universes...</div>
       </div>
+      
+      <!-- PAGINATION CONTROLS -->
+      <div id="paginationContainer" class="pagination-container"></div>
     </main>
   </div>
 
@@ -89,9 +97,7 @@
       
       <div class="review-form">
         <!-- Acting & Storyline Rating Sliders -->
-        <div id="ratingInputsContainer" class="rating-inputs-container">
-          <!-- Populated via JS -->
-        </div>
+        <div id="ratingInputsContainer" class="rating-inputs-container"></div>
 
         <textarea id="reviewInput" placeholder="Share your thoughts... (Keep it respectful, no profanity or explicit content)"></textarea>
         

@@ -4,6 +4,8 @@ import { getSavedStatuses, saveStatus, getSavedReviews, saveReview, containsProf
 let masterCatalog = [];
 let currentActiveIndex = null;
 let currentFilter = 'all';
+let currentPage = 1;
+const itemsPerPage = 8;
 
 async function init() {
   const container = document.getElementById('media-container');
@@ -19,7 +21,7 @@ async function init() {
     const movies = getCuratedMovies();
 
     masterCatalog = [...movies, ...shows];
-    renderGrid(masterCatalog);
+    applyFilterAndPagination();
   } catch (err) {
     console.error(err);
     container.innerHTML = '<div class="loading-state">Error initializing platform.</div>';
@@ -34,16 +36,40 @@ window.saveUsername = function() {
   }
 };
 
-window.renderGrid = function(items) {
-  const container = document.getElementById('media-container');
+function getFilteredItems() {
   const userStatuses = getSavedStatuses();
 
-  if (items.length === 0) {
+  if (currentFilter === 'all') {
+    return masterCatalog;
+  } else if (['Watching', 'Completed', 'Plan to Watch', 'On-Hold', 'Dropped'].includes(currentFilter)) {
+    return masterCatalog.filter(i => userStatuses[i.id] === currentFilter);
+  } else if (['South Korea', 'Japan', 'China', 'Thailand'].includes(currentFilter)) {
+    return masterCatalog.filter(i => i.country === currentFilter);
+  } else {
+    return masterCatalog.filter(i => i.category === currentFilter);
+  }
+}
+
+window.renderGrid = function() {
+  const container = document.getElementById('media-container');
+  const paginationContainer = document.getElementById('paginationContainer');
+  const userStatuses = getSavedStatuses();
+
+  const filteredItems = getFilteredItems();
+
+  if (filteredItems.length === 0) {
     container.innerHTML = '<div class="loading-state">No titles found in this view.</div>';
+    paginationContainer.innerHTML = '';
     return;
   }
 
-  container.innerHTML = items.map((item) => {
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  if (currentPage > totalPages) currentPage = 1;
+
+  const start = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = filteredItems.slice(start, start + itemsPerPage);
+
+  container.innerHTML = paginatedItems.map((item) => {
     const status = userStatuses[item.id];
     const statusBadge = status ? `<div class="card-status-tag">${status}</div>` : '';
     const realIndex = masterCatalog.findIndex(m => m.id === item.id);
@@ -57,7 +83,7 @@ window.renderGrid = function(items) {
         </div>
         <div class="card-content">
           <div>
-            <div class="card-category">${item.category}</div>
+            <div class="card-category">${item.country} • ${item.category}</div>
             <div class="card-title" title="${item.title}">${item.title}</div>
           </div>
           <button class="card-action" onclick="window.openDetailView(${realIndex})">Explore</button>
@@ -65,6 +91,23 @@ window.renderGrid = function(items) {
       </div>
     `;
   }).join('');
+
+  if (totalPages > 1) {
+    let pagesHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const activeClass = i === currentPage ? 'page-btn active' : 'page-btn';
+      pagesHTML += `<button class="${activeClass}" onclick="window.changePage(${i})">${i}</button>`;
+    }
+    paginationContainer.innerHTML = pagesHTML;
+  } else {
+    paginationContainer.innerHTML = '';
+  }
+};
+
+window.changePage = function(page) {
+  currentPage = page;
+  renderGrid();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.openDetailView = function(index) {
@@ -74,7 +117,7 @@ window.openDetailView = function(index) {
   currentActiveIndex = index;
 
   document.getElementById('detailImg').src = item.cover_url;
-  document.getElementById('detailCategory').innerText = item.category;
+  document.getElementById('detailCategory').innerText = `${item.country} • ${item.category}`;
   document.getElementById('detailTitle').innerText = item.title;
   document.getElementById('detailRating').innerText = `★ ${item.rating} / 10`;
   document.getElementById('detailDesc').innerText = item.summary;
@@ -220,7 +263,7 @@ window.showCatalogView = function() {
   document.getElementById('catalog-view').style.display = 'block';
   document.getElementById('searchBarContainer').style.display = 'block';
 
-  applyCurrentFilter();
+  renderGrid();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -230,31 +273,57 @@ window.filterCategory = function(category, btn) {
   document.getElementById('searchInput').value = '';
 
   currentFilter = category;
-  applyCurrentFilter();
+  currentPage = 1;
+  renderGrid();
 };
 
-function applyCurrentFilter() {
-  const userStatuses = getSavedStatuses();
-
-  if (currentFilter === 'all') {
-    renderGrid(masterCatalog);
-  } else if (['Watching', 'Completed', 'Plan to Watch', 'On-Hold', 'Dropped'].includes(currentFilter)) {
-    const filtered = masterCatalog.filter(i => userStatuses[i.id] === currentFilter);
-    renderGrid(filtered);
-  } else {
-    const filtered = masterCatalog.filter(i => i.category === currentFilter);
-    renderGrid(filtered);
-  }
+function applyFilterAndPagination() {
+  currentPage = 1;
+  renderGrid();
 }
 
 window.handleSearch = function() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
 
+  const container = document.getElementById('media-container');
+  const paginationContainer = document.getElementById('paginationContainer');
+  const userStatuses = getSavedStatuses();
+
   const filtered = masterCatalog.filter(item => 
-    item.title.toLowerCase().includes(query) || item.category.toLowerCase().includes(query)
+    item.title.toLowerCase().includes(query) || item.category.toLowerCase().includes(query) || item.country.toLowerCase().includes(query)
   );
-  renderGrid(filtered);
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="loading-state">No titles found matching your search.</div>';
+    paginationContainer.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = filtered.map((item) => {
+    const status = userStatuses[item.id];
+    const statusBadge = status ? `<div class="card-status-tag">${status}</div>` : '';
+    const realIndex = masterCatalog.findIndex(m => m.id === item.id);
+
+    return `
+      <div class="card">
+        <div class="card-img-wrapper">
+          <img src="${item.cover_url}" alt="${item.title}" loading="lazy">
+          ${statusBadge}
+          <div class="card-badge">★ ${item.rating}</div>
+        </div>
+        <div class="card-content">
+          <div>
+            <div class="card-category">${item.country} • ${item.category}</div>
+            <div class="card-title" title="${item.title}">${item.title}</div>
+          </div>
+          <button class="card-action" onclick="window.openDetailView(${realIndex})">Explore</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  paginationContainer.innerHTML = '';
 };
 
 window.openResetModal = function() {
@@ -271,12 +340,13 @@ window.confirmResetData = function() {
   closeResetModal();
   
   currentFilter = 'all';
+  currentPage = 1;
   document.querySelectorAll('.filter-btn').forEach((b, idx) => {
     if (idx === 0) b.classList.add('active');
     else b.classList.remove('active');
   });
 
-  renderGrid(masterCatalog);
+  renderGrid();
 };
 
 document.addEventListener('DOMContentLoaded', init);

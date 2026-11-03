@@ -19,7 +19,6 @@
 
 body {
   background-color: var(--bg-color);
-  /* Rich atmospheric ambient lighting in the background */
   background-image: 
     radial-gradient(circle at 15% 15%, rgba(244, 63, 94, 0.08) 0%, transparent 45%),
     radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.06) 0%, transparent 45%),
@@ -134,7 +133,6 @@ main {
   gap: 30px;
 }
 
-/* Enhanced 3D Layered Cards with Deep Shadows */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -182,7 +180,6 @@ main {
   font-weight: 800;
   color: #fbbf24;
   border: 1px solid rgba(251, 191, 36, 0.25);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .card-status-tag {
@@ -244,6 +241,34 @@ main {
   background: var(--accent-gradient);
   border-color: transparent;
   box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* PAGINATION STYLING */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 50px;
+}
+
+.page-btn {
+  background: rgba(13, 18, 31, 0.8);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.page-btn:hover, .page-btn.active {
+  background: var(--accent-gradient);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 /* DETAIL VIEW */
@@ -318,7 +343,6 @@ main {
   line-height: 1.7;
 }
 
-/* Tracker Box */
 .tracker-box {
   background: rgba(3, 5, 8, 0.6);
   border: 1px solid var(--border-color);
@@ -480,11 +504,6 @@ main {
   padding: 20px;
   border-radius: 14px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  transition: border-color 0.2s ease;
-}
-
-.review-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .review-header {
@@ -660,20 +679,11 @@ main {
   color: var(--text-color);
 }
 
-.modal-btn.cancel:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
 .modal-btn.confirm {
   background: var(--accent-gradient);
   border: none;
   color: #fff;
   box-shadow: 0 4px 20px var(--accent-glow);
-}
-
-.modal-btn.confirm:hover {
-  opacity: 0.95;
-  box-shadow: 0 6px 25px var(--accent-glow);
 }
 
 @media(max-width: 768px) {

@@ -44,15 +44,19 @@
       text-transform: uppercase;
     }
 
-    nav a {
+    nav button {
+      background: none;
+      border: none;
       color: var(--text-muted);
-      text-decoration: none;
+      cursor: pointer;
       margin-left: 15px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: color 0.2s;
     }
 
-    nav a:hover {
-      color: var(--text-color);
+    nav button:hover, nav button.active {
+      color: var(--accent-color);
     }
 
     .hero {
@@ -103,7 +107,7 @@
 
     .card img {
       width: 100%;
-      height: 200px;
+      height: 210px;
       object-fit: cover;
       background-color: #334155;
     }
@@ -113,7 +117,7 @@
     }
 
     .card-title {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 600;
       margin-bottom: 4px;
       white-space: nowrap;
@@ -140,65 +144,6 @@
   <header>
     <div class="logo">VARDÍRA</div>
     <nav>
-      <a href="#">Movies</a>
-      <a href="#">Series</a>
-      <a href="#">Comics</a>
-    </nav>
-  </header>
-
-  <section class="hero">
-    <h1>YOUR NEXT WORLD AWAITS.</h1>
-    <p>Discover movies, series, manga, webtoons, and graphic novels curated for you.</p>
-  </section>
-
-  <main>
-    <h2 class="section-title">Featured Content</h2>
-    <div id="media-container" class="media-grid">
-      <p class="loading-text">Loading catalog from database...</p>
-    </div>
-  </main>
-
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Main Integration Script -->
-  <script>
-    const SUPABASE_URL = 'https://qmtxnbbmrozxjbuubpfr.supabase.co';
-    const SUPABASE_KEY = 'Sb_publishable_jiq3gl_0SGsgP5PYXPx50w_N7jfSEcR';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    async function loadMedia() {
-      const container = document.getElementById('media-container');
-
-      const { data: mediaItems, error } = await supabase
-        .from('media')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching data from Supabase:', error);
-        container.innerHTML = '<p class="loading-text">Failed to load content. Check back shortly!</p>';
-        return;
-      }
-
-      if (!mediaItems || mediaItems.length === 0) {
-        container.innerHTML = '<p class="loading-text">No media available yet.</p>';
-        return;
-      }
-
-      container.innerHTML = mediaItems.map(item => `
-        <div class="card">
-          <img src="${item.cover_url || 'https://via.placeholder.com/300x450/1e293b/ffffff?text=No+Cover'}" alt="${item.title}">
-          <div class="card-content">
-            <div class="card-title">${item.title}</div>
-            <div class="card-category">${item.category}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', loadMedia);
-  </script>
-
-</body>
-</html>
+      <button class="active" onclick="loadContent('all')">All</button>
+      <button onclick="loadContent('shows')">Series</button>
+      <button onclick="loadContent('comics')

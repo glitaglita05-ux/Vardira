@@ -24,7 +24,7 @@ window.renderGrid = function(items) {
   const userStatuses = getSavedStatuses();
 
   if (items.length === 0) {
-    container.innerHTML = '<div class="loading-state">No matching titles found.</div>';
+    container.innerHTML = '<div class="loading-state">No titles found in this view.</div>';
     return;
   }
 
@@ -145,7 +145,7 @@ window.filterCategory = function(category, btn) {
 
   if (category === 'all') {
     renderGrid(masterCatalog);
-  } else if (category === 'Watching' || category === 'Completed') {
+  } else if (['Watching', 'Completed', 'Plan to Watch'].includes(category)) {
     const filtered = masterCatalog.filter(i => userStatuses[i.id] === category);
     renderGrid(filtered);
   } else {

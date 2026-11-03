@@ -54,6 +54,7 @@
       color: var(--accent-color);
       text-transform: uppercase;
       text-shadow: 0 0 20px var(--accent-glow);
+      cursor: pointer;
     }
 
     .search-bar {
@@ -232,125 +233,120 @@
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    /* Modal Popup Styling */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(7, 9, 14, 0.85);
-      backdrop-filter: blur(8px);
-      display: flex;
-      justify-content: center;
+    /* Detail Page View Styling */
+    #detail-view {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto;
+      padding-bottom: 50px;
+    }
+
+    .back-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
       align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      padding: 20px;
+      gap: 8px;
+      margin-bottom: 25px;
+      transition: all 0.2s;
     }
 
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
+    .back-btn:hover {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    .modal-content {
+    .detail-container {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      width: 100%;
-      max-width: 500px;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
       box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 25px var(--accent-glow);
-      transform: scale(0.95);
-      transition: transform 0.3s ease;
-      position: relative;
     }
 
-    .modal-overlay.active .modal-content {
-      transform: scale(1);
+    @media(min-width: 768px) {
+      .detail-container {
+        flex-direction: row;
+      }
     }
 
-    .modal-header {
-      position: relative;
-      height: 260px;
+    .detail-img-col {
+      width: 100%;
+      max-width: 320px;
+      background: #0f172a;
     }
 
-    .modal-header img {
+    .detail-img-col img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      min-height: 400px;
     }
 
-    .modal-close {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid var(--border-color);
-      color: #fff;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-
-    .modal-close:hover {
-      background: var(--accent-color);
-    }
-
-    .modal-body {
-      padding: 20px;
+    .detail-info-col {
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      justify-content: space-between;
+      gap: 20px;
+      flex-grow: 1;
     }
 
-    .modal-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-    }
-
-    .modal-meta {
-      display: flex;
-      gap: 15px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .detail-category {
+      font-size: 0.75rem;
+      color: var(--accent-color);
       text-transform: uppercase;
-      font-weight: 600;
+      letter-spacing: 1px;
+      font-weight: 700;
     }
 
-    .modal-desc {
-      font-size: 0.9rem;
+    .detail-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin-top: 5px;
+    }
+
+    .detail-rating {
+      display: inline-block;
+      background: rgba(7, 9, 14, 0.85);
+      border: 1px solid var(--border-color);
+      color: #fbbf24;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 12px;
+      width: fit-content;
+    }
+
+    .detail-desc {
+      font-size: 0.95rem;
       color: var(--text-muted);
-      line-height: 1.6;
-      max-height: 120px;
-      overflow-y: auto;
+      line-height: 1.7;
     }
 
-    .affiliate-btn {
+    .internal-affiliate-btn {
       display: block;
       width: 100%;
       background: var(--accent-color);
       color: #fff;
       text-align: center;
-      padding: 10px 0;
-      border-radius: 8px;
+      padding: 12px 0;
+      border-radius: 10px;
       font-weight: 700;
       text-decoration: none;
-      margin-top: 10px;
       box-shadow: 0 0 15px var(--accent-glow);
       transition: opacity 0.2s;
     }
 
-    .affiliate-btn:hover {
+    .internal-affiliate-btn:hover {
       opacity: 0.9;
     }
 
@@ -366,45 +362,49 @@
 <body>
 
   <header>
-    <div class="logo">VARDÍRA</div>
-    <div class="search-bar">
+    <div class="logo" onclick="showCatalogView()">VARDÍRA</div>
+    <div class="search-bar" id="searchBarContainer">
       <input type="text" id="searchInput" placeholder="Search titles..." oninput="handleSearch()">
     </div>
   </header>
 
-  <section class="hero">
-    <h1>YOUR NEXT WORLD AWAITS</h1>
-    <p>Explore curated cinema, television, and webtoons.</p>
-  </section>
+  <!-- MAIN CATALOG VIEW -->
+  <div id="catalog-view">
+    <section class="hero">
+      <h1>YOUR NEXT WORLD AWAITS</h1>
+      <p>Explore curated cinema, television, and webtoons.</p>
+    </section>
 
-  <div class="filter-nav">
-    <button class="filter-btn active" onclick="filterCatalog('all', this)">All</button>
-    <button class="filter-btn" onclick="filterCatalog('Movies', this)">Movies</button>
-    <button class="filter-btn" onclick="filterCatalog('Series', this)">Series</button>
-    <button class="filter-btn" onclick="filterCatalog('Comics', this)">Comics & Webtoons</button>
+    <div class="filter-nav">
+      <button class="filter-btn active" onclick="filterCatalog('all', this)">All</button>
+      <button class="filter-btn" onclick="filterCatalog('Movies', this)">Movies</button>
+      <button class="filter-btn" onclick="filterCatalog('Series', this)">Series</button>
+      <button class="filter-btn" onclick="filterCatalog('Comics', this)">Comics & Webtoons</button>
+    </div>
+
+    <main>
+      <div id="media-container" class="media-grid">
+        <div class="loading-state">Loading universes...</div>
+      </div>
+    </main>
   </div>
 
-  <main>
-    <div id="media-container" class="media-grid">
-      <div class="loading-state">Loading universes...</div>
-    </div>
-  </main>
-
-  <!-- Detailed Modal Popup -->
-  <div id="mediaModal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <button class="modal-close" onclick="closeModal()">✕</button>
-        <img id="modalImg" src="" alt="">
+  <!-- INTERNAL DETAIL PAGE VIEW -->
+  <div id="detail-view">
+    <button class="back-btn" onclick="showCatalogView()">← Back to Catalog</button>
+    <div class="detail-container">
+      <div class="detail-img-col">
+        <img id="detailImg" src="" alt="">
       </div>
-      <div class="modal-body">
-        <div id="modalCategory" class="modal-category"></div>
-        <div id="modalTitle" class="modal-title"></div>
-        <div class="modal-meta">
-          <span id="modalRating">★ 0.0</span>
+      <div class="detail-info-col">
+        <div>
+          <div id="detailCategory" class="detail-category"></div>
+          <div id="detailTitle" class="detail-title"></div>
+          <div id="detailRating" class="detail-rating" style="margin-top: 10px;">★ 0.0</div>
+          <p id="detailDesc" class="detail-desc" style="margin-top: 15px;"></p>
         </div>
-        <div id="modalDesc" class="modal-desc"></div>
-        <a id="modalAffiliateLink" href="#" target="_blank" class="affiliate-btn">Stream / Read on Official Platform</a>
+        <!-- This is where your future affiliate/streaming link will live smoothly -->
+        <a id="detailActionLink" href="#" onclick="alert('Affiliate or streaming integration ready for setup!')" class="internal-affiliate-btn">Stream / Read Now</a>
       </div>
     </div>
   </div>
@@ -436,7 +436,7 @@
           { title: "Neon Syndicate", category: "Movies", rating: "7.9", cover_url: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80", summary: "In a futuristic underworld, a rogue crew plans a dangerous heist against all odds.", link: "#" }
         ];
 
-        // 3. Fetch Comics & Webtoons from AniList API[span_0](start_span)[span_0](end_span)
+        // 3. Fetch Comics & Webtoons from AniList API
         const anilistQuery = `
           query {
             Page(page: 1, perPage: 18) {
@@ -504,28 +504,34 @@
               <div class="card-category">${item.category}</div>
               <div class="card-title" title="${item.title}">${item.title}</div>
             </div>
-            <button class="card-action" onclick="openModal(${index})">Explore</button>
+            <button class="card-action" onclick="openDetailView(${index})">Explore</button>
           </div>
         </div>
       `).join('');
     }
 
-    function openModal(index) {
+    function openDetailView(index) {
       const item = masterCatalog[index];
       if (!item) return;
 
-      document.getElementById('modalImg').src = item.cover_url;
-      document.getElementById('modalCategory').innerText = item.category;
-      document.getElementById('modalTitle').innerText = item.title;
-      document.getElementById('modalRating').innerText = `★ ${item.rating} / 10`;
-      document.getElementById('modalDesc').innerText = item.summary;
-      document.getElementById('modalAffiliateLink').href = item.link;
+      document.getElementById('detailImg').src = item.cover_url;
+      document.getElementById('detailCategory').innerText = item.category;
+      document.getElementById('detailTitle').innerText = item.title;
+      document.getElementById('detailRating').innerText = `★ ${item.rating} / 10`;
+      document.getElementById('detailDesc').innerText = item.summary;
 
-      document.getElementById('mediaModal').classList.add('active');
+      // Hide catalog, show detail view
+      document.getElementById('catalog-view').style.display = 'none';
+      document.getElementById('searchBarContainer').style.display = 'none';
+      document.getElementById('detail-view').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function closeModal(event) {
-      document.getElementById('mediaModal').classList.remove('active');
+    function showCatalogView() {
+      document.getElementById('detail-view').style.display = 'none';
+      document.getElementById('catalog-view').style.display = 'block';
+      document.getElementById('searchBarContainer').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function filterCatalog(category, btn) {

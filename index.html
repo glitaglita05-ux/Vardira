@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VARDÍRA</title>
+  <title>VARDÍRA — Entertainment Discovery</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent-color: #e11d48;
+      --bg-color: #07090e;
+      --card-bg: #121824;
+      --card-hover: #1b2436;
+      --accent-color: #f43f5e;
+      --accent-glow: rgba(244, 63, 94, 0.25);
       --text-color: #f8fafc;
       --text-muted: #94a3b8;
+      --border-color: #1e293b;
     }
 
     * {
@@ -29,50 +32,101 @@
 
     header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 15px;
       padding-bottom: 20px;
-      border-bottom: 1px solid #334155;
-      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 25px;
+    }
+
+    @media(min-width: 600px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
     }
 
     .logo {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       color: var(--accent-color);
       text-transform: uppercase;
+      text-shadow: 0 0 20px var(--accent-glow);
     }
 
-    nav {
+    .search-bar {
+      position: relative;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 10px 15px;
+      border-radius: 20px;
+      color: var(--text-color);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .filter-nav {
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      margin-bottom: 25px;
+      scrollbar-width: none;
     }
 
-    nav button {
-      background: none;
-      border: none;
+    .filter-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 20px;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      transition: color 0.2s;
+      white-space: nowrap;
+      transition: all 0.2s ease;
     }
 
-    nav button:hover, nav button.active {
-      color: var(--accent-color);
+    .filter-btn:hover {
+      color: var(--text-color);
+      border-color: var(--text-muted);
+    }
+
+    .filter-btn.active {
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 15px var(--accent-glow);
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 35px;
     }
 
     .hero h1 {
       font-size: 1.8rem;
       font-weight: 800;
       letter-spacing: 1px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       text-transform: uppercase;
     }
 
@@ -81,44 +135,68 @@
       font-size: 0.9rem;
     }
 
-    .section-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-      border-left: 4px solid var(--accent-color);
-      padding-left: 10px;
-    }
-
     .media-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 18px;
       margin-bottom: 40px;
     }
 
     .card {
       background-color: var(--card-bg);
-      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(244, 63, 94, 0.4);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
+    }
+
+    .card-img-wrapper {
+      position: relative;
+      height: 220px;
     }
 
     .card img {
       width: 100%;
-      height: 190px;
+      height: 100%;
       object-fit: cover;
-      background-color: #334155;
+      background-color: #1e293b;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(7, 9, 14, 0.85);
+      border: 1px solid var(--border-color);
+      color: #fbbf24;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      backdrop-filter: blur(4px);
     }
 
     .card-content {
-      padding: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+      justify-content: space-between;
     }
 
     .card-title {
       font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 4px;
+      font-weight: 700;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -126,17 +204,39 @@
 
     .card-category {
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--accent-color);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      font-weight: 600;
     }
 
-    .loading-text {
-      color: var(--text-muted);
-      font-size: 0.9rem;
+    .card-action {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--accent-color);
+      color: var(--text-color);
+      text-align: center;
+      padding: 6px 0;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 6px;
+      transition: all 0.2s;
+    }
+
+    .card-action:hover {
+      background: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .loading-state {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 20px;
+      color: var(--text-muted);
+      padding: 40px;
+      font-size: 0.95rem;
     }
   </style>
 </head>
@@ -144,124 +244,151 @@
 
   <header>
     <div class="logo">VARDÍRA</div>
-    <nav>
-      <button class="active" onclick="switchTab('all', this)">All</button>
-      <button onclick="switchTab('shows', this)">Series</button>
-      <button onclick="switchTab('comics', this)">Comics</button>
-    </nav>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search titles..." oninput="handleSearch()">
+    </div>
   </header>
 
   <section class="hero">
-    <h1>YOUR NEXT WORLD AWAITS.</h1>
-    <p>Discover series, manga, webtoons, and graphic novels.</p>
+    <h1>YOUR NEXT WORLD AWAITS</h1>
+    <p>Explore curated cinema, television, and webtoons.</p>
   </section>
 
+  <div class="filter-nav">
+    <button class="filter-btn active" onclick="filterCatalog('all', this)">All</button>
+    <button class="filter-btn" onclick="filterCatalog('Movies', this)">Movies</button>
+    <button class="filter-btn" onclick="filterCatalog('Series', this)">Series</button>
+    <button class="filter-btn" onclick="filterCatalog('Comics', this)">Comics & Webtoons</button>
+  </div>
+
   <main>
-    <h2 class="section-title" id="grid-title">Trending Content</h2>
     <div id="media-container" class="media-grid">
-      <p class="loading-text">Loading catalog...</p>
+      <div class="loading-state">Loading universes...</div>
     </div>
   </main>
 
   <script>
-    let cachedItems = [];
+    let masterCatalog = [];
 
-    async function fetchAllData() {
+    async function loadAllContent() {
       const container = document.getElementById('media-container');
-      
+
       try {
-        // 1. Fetch TV Shows
-        const showsPromise = fetch('https://api.tvmaze.com/shows')
+        // 1. Fetch TV Series from TVMaze
+        const tvPromise = fetch('https://api.tvmaze.com/shows')
           .then(res => res.json())
-          .then(data => data.slice(0, 12).map(show => ({
+          .then(data => data.slice(0, 15).map(show => ({
             title: show.name,
             category: 'Series',
-            cover_url: show.image ? show.image.medium : 'https://via.placeholder.com/210x295/1e293b/ffffff?text=No+Cover'
+            rating: show.rating && show.rating.average ? show.rating.average : '7.5',
+            cover_url: show.image ? show.image.medium : 'https://via.placeholder.com/210x295/121824/f8fafc?text=No+Cover',
+            link: show.url || '#'
           })))
           .catch(() => []);
 
-        // 2. Fetch Comics / Webtoons via AniList
-        const query = `
+        // 2. Curated Movies
+        const extraMovies = [
+          { title: "Midnight Echoes", category: "Movies", rating: "8.4", cover_url: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60", link: "#" },
+          { title: "Crimson Veil", category: "Movies", rating: "8.1", cover_url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=60", link: "#" },
+          { title: "Neon Syndicate", category: "Movies", rating: "7.9", cover_url: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60", link: "#" }
+        ];
+
+        // 3. Fetch Comics & Webtoons from AniList API[span_0](start_span)[span_0](end_span)
+        const anilistQuery = `
           query {
-            Page(page: 1, perPage: 12) {
+            Page(page: 1, perPage: 15) {
               media(type: MANGA, sort: TRENDING_DESC) {
-                title {
-                  english
-                  romaji
-                }
-                coverImage {
-                  large
-                }
+                title { english romaji }
+                coverImage { large }
+                averageScore
+                siteUrl
               }
             }
           }
         `;
-
         const comicsPromise = fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ query })
+          body: JSON.stringify({ query: anilistQuery })
         })
         .then(res => res.json())
-        .then(result => {
-          if (!result.data || !result.data.Page) return [];
-          return result.data.Page.media.map(item => ({
-            title: item.title.english || item.title.romaji || 'Untitled',
-            category: 'Comic / Webtoon',
-            cover_url: item.coverImage ? item.coverImage.large : 'https://via.placeholder.com/210x295/1e293b/ffffff?text=No+Cover'
+        .then(res => {
+          if (!res.data || !res.data.Page) return [];
+          return res.data.Page.media.map(m => ({
+            title: m.title.english || m.title.romaji || 'Untitled',
+            category: 'Comics',
+            rating: m.averageScore ? (m.averageScore / 10).toFixed(1) : '8.0',
+            cover_url: m.coverImage ? m.coverImage.large : 'https://via.placeholder.com/210x295/121824/f8fafc?text=No+Cover',
+            link: m.siteUrl || '#'
           }));
         })
         .catch(() => []);
 
-        // Wait for both requests
-        const [shows, comics] = await Promise.all([showsPromise, comicsPromise]);
+        const [shows, comics] = await Promise.all([tvPromise, comicsPromise]);
         
-        cachedItems = [...shows, ...comics];
+        masterCatalog = [...extraMovies, ...shows, ...comics];
 
-        if (cachedItems.length === 0) {
-          container.innerHTML = '<p class="loading-text">Could not load items. Please check your connection.</p>';
+        if (masterCatalog.length === 0) {
+          container.innerHTML = '<div class="loading-state">Failed to load content.</div>';
           return;
         }
 
-        renderItems(cachedItems);
+        renderGrid(masterCatalog);
 
       } catch (err) {
-        console.error("Error loading data:", err);
-        container.innerHTML = '<p class="loading-text">Error loading catalog.</p>';
+        console.error(err);
+        container.innerHTML = '<div class="loading-state">Error initializing platform.</div>';
       }
     }
 
-    function renderItems(items) {
+    function renderGrid(items) {
       const container = document.getElementById('media-container');
+      if (items.length === 0) {
+        container.innerHTML = '<div class="loading-state">No matching titles found.</div>';
+        return;
+      }
+
       container.innerHTML = items.map(item => `
         <div class="card">
-          <img src="${item.cover_url}" alt="${item.title}" loading="lazy">
+          <div class="card-img-wrapper">
+            <img src="${item.cover_url}" alt="${item.title}" loading="lazy">
+            <div class="card-badge">★ ${item.rating}</div>
+          </div>
           <div class="card-content">
-            <div class="card-title">${item.title}</div>
-            <div class="card-category">${item.category}</div>
+            <div>
+              <div class="card-category">${item.category}</div>
+              <div class="card-title" title="${item.title}">${item.title}</div>
+            </div>
+            <a href="${item.link}" target="_blank" class="card-action">Explore</a>
           </div>
         </div>
       `).join('');
     }
 
-    function switchTab(filter, btn) {
-      // Update active button style
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    function filterCatalog(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      document.getElementById('searchInput').value = '';
 
-      if (filter === 'shows') {
-        const filtered = cachedItems.filter(item => item.category === 'Series');
-        renderItems(filtered);
-      } else if (filter === 'comics') {
-        const filtered = cachedItems.filter(item => item.category === 'Comic / Webtoon');
-        renderItems(filtered);
+      if (category === 'all') {
+        renderGrid(masterCatalog);
       } else {
-        renderItems(cachedItems);
+        const filtered = masterCatalog.filter(i => i.category === category);
+        renderGrid(filtered);
       }
     }
 
-    // Run on load
-    document.addEventListener('DOMContentLoaded', fetchAllData);
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+
+      const filtered = masterCatalog.filter(item => 
+        item.title.toLowerCase().includes(query) || item.category.toLowerCase().includes(query)
+      );
+      renderGrid(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAllContent);
   </script>
 
 </body>

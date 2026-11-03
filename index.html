@@ -221,6 +221,7 @@
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
+      cursor: pointer;
       text-decoration: none;
       margin-top: 6px;
       transition: all 0.2s;
@@ -229,6 +230,128 @@
     .card-action:hover {
       background: var(--accent-color);
       box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* Modal Popup Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(7, 9, 14, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 25px var(--accent-glow);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      position: relative;
+      height: 260px;
+    }
+
+    .modal-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--accent-color);
+    }
+
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .modal-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .modal-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .affiliate-btn {
+      display: block;
+      width: 100%;
+      background: var(--accent-color);
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-top: 10px;
+      box-shadow: 0 0 15px var(--accent-glow);
+      transition: opacity 0.2s;
+    }
+
+    .affiliate-btn:hover {
+      opacity: 0.9;
     }
 
     .loading-state {
@@ -267,6 +390,25 @@
     </div>
   </main>
 
+  <!-- Detailed Modal Popup -->
+  <div id="mediaModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <img id="modalImg" src="" alt="">
+      </div>
+      <div class="modal-body">
+        <div id="modalCategory" class="modal-category"></div>
+        <div id="modalTitle" class="modal-title"></div>
+        <div class="modal-meta">
+          <span id="modalRating">★ 0.0</span>
+        </div>
+        <div id="modalDesc" class="modal-desc"></div>
+        <a id="modalAffiliateLink" href="#" target="_blank" class="affiliate-btn">Stream / Read on Official Platform</a>
+      </div>
+    </div>
+  </div>
+
   <script>
     let masterCatalog = [];
 
@@ -277,30 +419,32 @@
         // 1. Fetch TV Series from TVMaze
         const tvPromise = fetch('https://api.tvmaze.com/shows')
           .then(res => res.json())
-          .then(data => data.slice(0, 15).map(show => ({
+          .then(data => data.slice(0, 18).map(show => ({
             title: show.name,
             category: 'Series',
             rating: show.rating && show.rating.average ? show.rating.average : '7.5',
-            cover_url: show.image ? show.image.medium : 'https://via.placeholder.com/210x295/121824/f8fafc?text=No+Cover',
+            cover_url: show.image ? show.image.original || show.image.medium : 'https://via.placeholder.com/210x295/121824/f8fafc?text=No+Cover',
+            summary: show.summary ? show.summary.replace(/<[^>]*>?/gm, '') : 'No description available for this series.',
             link: show.url || '#'
           })))
           .catch(() => []);
 
         // 2. Curated Movies
         const extraMovies = [
-          { title: "Midnight Echoes", category: "Movies", rating: "8.4", cover_url: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60", link: "#" },
-          { title: "Crimson Veil", category: "Movies", rating: "8.1", cover_url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=60", link: "#" },
-          { title: "Neon Syndicate", category: "Movies", rating: "7.9", cover_url: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60", link: "#" }
+          { title: "Midnight Echoes", category: "Movies", rating: "8.4", cover_url: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&auto=format&fit=crop&q=80", summary: "A dark atmospheric thriller following a mysterious investigation in a neon-lit metropolis.", link: "#" },
+          { title: "Crimson Veil", category: "Movies", rating: "8.1", cover_url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80", summary: "An intense romantic drama exploring forbidden alliances and dark secrets.", link: "#" },
+          { title: "Neon Syndicate", category: "Movies", rating: "7.9", cover_url: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80", summary: "In a futuristic underworld, a rogue crew plans a dangerous heist against all odds.", link: "#" }
         ];
 
         // 3. Fetch Comics & Webtoons from AniList API[span_0](start_span)[span_0](end_span)
         const anilistQuery = `
           query {
-            Page(page: 1, perPage: 15) {
+            Page(page: 1, perPage: 18) {
               media(type: MANGA, sort: TRENDING_DESC) {
                 title { english romaji }
-                coverImage { large }
+                coverImage { extraLarge large }
                 averageScore
+                description
                 siteUrl
               }
             }
@@ -318,7 +462,8 @@
             title: m.title.english || m.title.romaji || 'Untitled',
             category: 'Comics',
             rating: m.averageScore ? (m.averageScore / 10).toFixed(1) : '8.0',
-            cover_url: m.coverImage ? m.coverImage.large : 'https://via.placeholder.com/210x295/121824/f8fafc?text=No+Cover',
+            cover_url: m.coverImage ? (m.coverImage.extraLarge || m.coverImage.large) : 'https://via.placeholder.com/210x295/121824/f8fafc?text=No+Cover',
+            summary: m.description ? m.description.replace(/<[^>]*>?/gm, '') : 'No description available for this webtoon.',
             link: m.siteUrl || '#'
           }));
         })
@@ -348,7 +493,7 @@
         return;
       }
 
-      container.innerHTML = items.map(item => `
+      container.innerHTML = items.map((item, index) => `
         <div class="card">
           <div class="card-img-wrapper">
             <img src="${item.cover_url}" alt="${item.title}" loading="lazy">
@@ -359,10 +504,28 @@
               <div class="card-category">${item.category}</div>
               <div class="card-title" title="${item.title}">${item.title}</div>
             </div>
-            <a href="${item.link}" target="_blank" class="card-action">Explore</a>
+            <button class="card-action" onclick="openModal(${index})">Explore</button>
           </div>
         </div>
       `).join('');
+    }
+
+    function openModal(index) {
+      const item = masterCatalog[index];
+      if (!item) return;
+
+      document.getElementById('modalImg').src = item.cover_url;
+      document.getElementById('modalCategory').innerText = item.category;
+      document.getElementById('modalTitle').innerText = item.title;
+      document.getElementById('modalRating').innerText = `★ ${item.rating} / 10`;
+      document.getElementById('modalDesc').innerText = item.summary;
+      document.getElementById('modalAffiliateLink').href = item.link;
+
+      document.getElementById('mediaModal').classList.add('active');
+    }
+
+    function closeModal(event) {
+      document.getElementById('mediaModal').classList.remove('active');
     }
 
     function filterCatalog(category, btn) {

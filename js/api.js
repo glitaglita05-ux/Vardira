@@ -1,4 +1,3 @@
-// Ασιατικές Ταινίες & Curated Dramas (K-Drama, C-Drama, J-Drama, Thai, etc.)
 export function getCuratedMovies() {
   return [
     {
@@ -40,7 +39,6 @@ export function getCuratedMovies() {
   ];
 }
 
-// Φόρτωση Δημοφιλών Ασιατικών Σειρών μέσω TVMaze API
 export async function fetchTVShows() {
   const queryTitles = [
     'Squid Game', 'Crash Landing on You', 'Goblin', 'Vincenzo', 
@@ -67,55 +65,6 @@ export async function fetchTVShows() {
     }));
   } catch (err) {
     console.error("Error fetching Asian TV shows:", err);
-    return [];
-  }
-}
-
-// Φόρτωση Ασιατικών Comics & Webtoons (AniList API)
-export async function fetchComics() {
-  const query = `
-    query {
-      Page(page: 1, perPage: 10) {
-        media(type: MANGA, sort: POPULARITY_DESC, countryOfOrigin: "KR") {
-          id
-          title {
-            english
-            romaji
-          }
-          averageScore
-          coverImage {
-            large
-          }
-          description
-        }
-      }
-    }
-  `;
-
-  try {
-    const response = await fetch('https://graphql.anilist.co', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ query })
-    });
-
-    const data = await response.json();
-    const mediaList = data.data.Page.media;
-
-    return mediaList.map(item => ({
-      id: `comic_${item.id}`,
-      title: item.title.english || item.title.romaji,
-      category: "Comics",
-      country: "South Korea",
-      rating: (item.averageScore / 10).toFixed(1),
-      cover_url: item.coverImage.large,
-      summary: item.description ? item.description.replace(/<[^>]*>?/gm, '') : 'No description available.'
-    }));
-  } catch (err) {
-    console.error("Error fetching Webtoons:", err);
     return [];
   }
 }

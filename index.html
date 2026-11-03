@@ -3,15 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VARDÍRA — Entertainment & Drama Tracker</title>
+  <title>VARDÍRA — Asian Drama & Cinema Tracker</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+  <!-- USERNAME SETUP MODAL -->
+  <div id="usernameModal" class="modal-overlay" style="display: flex;">
+    <div class="modal-card">
+      <h3>Welcome to VARDÍRA</h3>
+      <p>Choose a display name for your reviews and comments. Don't worry, you can change it anytime or use any name you like!</p>
+      <input type="text" id="usernameInput" placeholder="Enter your username..." class="tracker-select" style="width: 100%; text-align: center;">
+      <button class="modal-btn confirm" style="width: 100%; margin-top: 10px;" onclick="saveUsername()">Enter Universe</button>
+    </div>
+  </div>
+
   <header>
     <div class="logo" onclick="showCatalogView()">VARDÍRA</div>
-    <div class="search-bar" id="searchBarContainer">
-      <input type="text" id="searchInput" placeholder="Search titles..." oninput="handleSearch()">
+    <div style="display: flex; gap: 10px; align-items: center; width: 100%; max-width: 450px; justify-content: flex-end;">
+      <div class="search-bar" id="searchBarContainer" style="flex-grow: 1;">
+        <input type="text" id="searchInput" placeholder="Search titles..." oninput="handleSearch()">
+      </div>
+      <button class="danger-icon-btn" onclick="openResetModal()" title="Reset All Data">🗑️</button>
     </div>
   </header>
 
@@ -19,17 +32,18 @@
   <div id="catalog-view">
     <section class="hero">
       <h1>ASIAN DRAMA & CINEMA HUB</h1>
-      <p>Track, review, and explore cinema</p>
+      <p>Track, rate, and review K-Dramas, C-Dramas, J-Dramas, Thai series, and Asian movies.</p>
     </section>
 
     <div class="filter-nav">
       <button class="filter-btn active" onclick="filterCategory('all', this)">All</button>
       <button class="filter-btn" onclick="filterCategory('Movies', this)">Movies</button>
       <button class="filter-btn" onclick="filterCategory('Series', this)">Series</button>
-      <button class="filter-btn" onclick="filterCategory('Comics', this)">Comics & Webtoons</button>
       <button class="filter-btn" onclick="filterCategory('Watching', this)">👀 Watching</button>
       <button class="filter-btn" onclick="filterCategory('Completed', this)">✅ Completed</button>
       <button class="filter-btn" onclick="filterCategory('Plan to Watch', this)">📌 Plan to Watch</button>
+      <button class="filter-btn" onclick="filterCategory('On-Hold', this)">⏸️ On-Hold</button>
+      <button class="filter-btn" onclick="filterCategory('Dropped', this)">❌ Dropped</button>
     </div>
 
     <main>
@@ -39,7 +53,7 @@
     </main>
   </div>
 
-  <!-- DETAIL VIEW (WITH TRACKER & REVIEWS / SPOILER TAGS) -->
+  <!-- DETAIL VIEW -->
   <div id="detail-view">
     <button class="back-btn" onclick="showCatalogView()">← Back to Catalog</button>
     
@@ -55,14 +69,13 @@
           <p id="detailDesc" class="detail-desc" style="margin-top: 15px;"></p>
         </div>
 
-        <!-- MDL Tracker Status Box -->
         <div class="tracker-box">
-          <div class="tracker-label">My Watch / Read Status</div>
+          <div class="tracker-label">My Watch Status</div>
           <select id="statusSelect" class="tracker-select" onchange="updateTitleStatus()">
             <option value="">(Not in list)</option>
-            <option value="Watching">Watching / Reading</option>
+            <option value="Watching">Watching</option>
             <option value="Completed">Completed</option>
-            <option value="Plan to Watch">Plan to Watch / Read</option>
+            <option value="Plan to Watch">Plan to Watch</option>
             <option value="On-Hold">On-Hold</option>
             <option value="Dropped">Dropped</option>
           </select>
@@ -70,12 +83,22 @@
       </div>
     </div>
 
-    <!-- Community Reviews & Spoiler Section -->
+    <!-- Community Reviews Section -->
     <div class="reviews-section">
       <h3>Community Reviews & Thoughts</h3>
       
       <div class="review-form">
-        <textarea id="reviewInput" placeholder="Share your thoughts... (Type your review here)"></textarea>
+        <!-- Acting & Storyline Rating Sliders -->
+        <div id="ratingInputsContainer" class="rating-inputs-container">
+          <!-- Populated via JS -->
+        </div>
+
+        <textarea id="reviewInput" placeholder="Share your thoughts... (Keep it respectful, no profanity or explicit content)"></textarea>
+        
+        <div id="filterError" style="color: var(--accent-color); font-size: 0.8rem; display: none;">
+          ⚠️ Your review contains prohibited words (profanity or explicit terms). Please revise.
+        </div>
+
         <div class="review-form-controls">
           <label class="spoiler-checkbox-label">
             <input type="checkbox" id="spoilerCheck"> Contains Spoilers ⚠️
@@ -84,13 +107,22 @@
         </div>
       </div>
 
-      <div id="reviewsContainer" class="reviews-list">
-        <!-- Reviews will appear here -->
+      <div id="reviewsContainer" class="reviews-list"></div>
+    </div>
+  </div>
+
+  <!-- RESET MODAL -->
+  <div id="resetModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3>⚠️ Clear Entire Watchlist & Data?</h3>
+      <p>This will permanently delete all your tracked statuses, custom lists, and reviews stored on this device. <strong>Once deleted, there is no going back.</strong></p>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" onclick="closeResetModal()">Cancel</button>
+        <button class="modal-btn confirm" onclick="confirmResetData()">Yes, Delete Everything</button>
       </div>
     </div>
   </div>
 
-  <!-- Script Modules -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
